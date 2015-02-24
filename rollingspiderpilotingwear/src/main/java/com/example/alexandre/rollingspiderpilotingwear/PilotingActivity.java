@@ -21,33 +21,22 @@ public class PilotingActivity extends Activity implements DeviceControllerListen
     public DeviceController deviceController;
     public ARDiscoveryDeviceService service;
 
-    private Button emergencyBt;
-    private Button takeoffBt;
-    private Button landingBt;
-
-    private Button gazUpBt;
-    private Button gazDownBt;
-    private Button yawLeftBt;
-    private Button yawRightBt;
-
-    private Button forwardBt;
-    private Button backBt;
-    private Button rollLeftBt;
-    private Button rollRightBt;
-
     private TextView batteryLabel;
 
-    private AlertDialog alertDialog;
+    //private AlertDialog alertDialog;
 
+    private Boolean flying = false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        /*setContentView(R.layout.activity_piloting);
+        setContentView(R.layout.activity_piloting);
 
-        emergencyBt = (Button) findViewById(R.id.emergencyBt);
+        batteryLabel = (TextView) findViewById(R.id.text);
+
+        /*emergencyBt = (Button) findViewById(R.id.emergencyBt);
         emergencyBt.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v)
             {
@@ -367,10 +356,29 @@ public class PilotingActivity extends Activity implements DeviceControllerListen
             alertDialogBuilder.setTitle("Connecting ...");
 
             // create alert dialog
-            alertDialog = alertDialogBuilder.create();
+            //alertDialog = alertDialogBuilder.create();
 
             // show it
-            alertDialog.show();
+            //alertDialog.show();
+            batteryLabel.setText("Connecting...");
+
+            batteryLabel.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v)
+                {
+                    if (deviceController != null)
+                    {
+                        if(!flying){
+                            deviceController.sendTakeoff();
+                            flying = true;
+                            batteryLabel.setText("OMG I'm flying :D");
+                        } else {
+                            deviceController.sendLanding();
+                            flying = false;
+                            batteryLabel.setText("OK back on earth..");
+                        }
+                    }
+                }
+            });
 
             new Thread(new Runnable() {
                 @Override
@@ -380,21 +388,35 @@ public class PilotingActivity extends Activity implements DeviceControllerListen
 
                     failed = deviceController.start();
 
-                    runOnUiThread(new Runnable() {
+                    /*runOnUiThread(new Runnable() {
                         @Override
                         public void run()
                         {
                             //alertDialog.hide();
                             alertDialog.dismiss();
                         }
-                    });
+                    });*/
 
                     if (failed)
                     {
-                        finish();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run()
+                            {
+                                batteryLabel.setText("Connection failed !");
+                            }
+                        });
+                        //finish();
                     }
                     else
                     {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run()
+                            {
+                                batteryLabel.setText("Good, i'm connected !");
+                            }
+                        });
                         //only with RollingSpider in version 1.97 : date and time must be sent to permit a reconnection
                         Date currentDate = new Date(System.currentTimeMillis());
                         deviceController.sendDate(currentDate);
@@ -416,29 +438,12 @@ public class PilotingActivity extends Activity implements DeviceControllerListen
             alertDialogBuilder.setTitle("Disconnecting ...");
 
             // create alert dialog
-            alertDialog = alertDialogBuilder.create();
+            //alertDialog = alertDialogBuilder.create();
 
             // show it
-            alertDialog.show();
+            //alertDialog.show();
 
-            new Thread(new Runnable() {
-                @Override
-                public void run()
-                {
-                    deviceController.stop();
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run()
-                        {
-                            //alertDialog.hide();
-                            alertDialog.dismiss();
-                            finish();
-                        }
-                    });
-
-                }
-            }).start();
+            batteryLabel.setText("Disconnecting ...");
         }
     }
 
@@ -469,7 +474,7 @@ public class PilotingActivity extends Activity implements DeviceControllerListen
             @Override
             public void run()
             {
-                batteryLabel.setText(String.format("%d%%", percent));
+                //batteryLabel.setText(String.format("%d%%", percent));
             }
         });
 

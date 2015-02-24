@@ -76,7 +76,9 @@ public class MainActivity extends Activity implements ARDiscoveryServicesDevices
         setContentView(R.layout.activity_main);
 
         startServices();
-        initBroadcastReceiver();
+
+        // init brocast receiver
+        ardiscoveryServicesDevicesListUpdatedReceiver = new ARDiscoveryServicesDevicesListUpdatedReceiver(this);
         initServiceConnection();
 
         listView = (WearableListView) findViewById(R.id.wearable_list);
@@ -138,11 +140,6 @@ public class MainActivity extends Activity implements ARDiscoveryServicesDevices
 
 
         }
-    }
-
-    private void initBroadcastReceiver()
-    {
-        ardiscoveryServicesDevicesListUpdatedReceiver = new ARDiscoveryServicesDevicesListUpdatedReceiver(this);
     }
 
     private void initServiceConnection()
@@ -246,8 +243,6 @@ public class MainActivity extends Activity implements ARDiscoveryServicesDevices
             }
 
             deviceNameList = deviceNames.toArray(new String[deviceNames.size()]);
-
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, deviceNameList);
 
             // Assign adapter to ListView
             listView.setAdapter(new Adapter(this, deviceNameList));
